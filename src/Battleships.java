@@ -74,7 +74,12 @@ public class Battleships {
         @Override
         protected String getResponse(JSONObject params) {
             initializeGrid();
-            return getNewGrid();
+            try {
+                return getNewGrid();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "";
+            }
         }
     }
 
@@ -163,6 +168,7 @@ public class Battleships {
                 try {
                     target = calculateTarget();
                 } catch (Exception e) {
+                    e.printStackTrace();
                     System.err.println("Error: " + e + ". Trying again...");
                 }
             }
