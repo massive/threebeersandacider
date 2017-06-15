@@ -28,28 +28,31 @@ public class Battleships {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         System.out.println("Running at " + server.getAddress());
 
-        HttpContext ctx1 = server.createContext("/start_game", new StartGameHandler());
-
-        HttpContext ctx2 = server.createContext("/next_turn", new NextTurnHandler());
-
+        server.createContext("/start_game", new StartGameHandler());
+        server.createContext("/next_turn", new NextTurnHandler());
         server.createContext("/end_game", new EndGameHandler());
+
         server.start();
     }
 
     static abstract class HandlerWithStringResponse implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            InputStream bodyStream = t.getRequestBody();
-            String requestBody = convertStreamToString(bodyStream);
             Object parsed;
 
-            try {
-                parsed = new JSONParser().parse(requestBody);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                return;
-            }
+            if (t.getRequestMethod().equals("POST")) {
+                InputStream bodyStream = t.getRequestBody();
+                String requestBody = convertStreamToString(bodyStream);
 
+                try {
+                    parsed = new JSONParser().parse(requestBody);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return;
+                }
+            } else {
+                parsed = null;
+            }
 
             String response = getResponse((JSONObject) parsed);
             t.sendResponseHeaders(200, response.length());
