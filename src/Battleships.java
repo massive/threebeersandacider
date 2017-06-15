@@ -88,7 +88,7 @@ public class Battleships {
     private static String getNewGrid()
     {
         String[][] grid = new String[10][10];
-        List<Ship> ships = new LinkedList<Ship>( Arrays.asList(new Ship("Carrier", 5), new Ship("Battleship", 4), new Ship("Cruiser", 3), new Ship("Submarine", 3), new Ship("Destroyer", 2)));
+        List<Ship> ships = new LinkedList<Ship>( Arrays.asList(new Ship(1,"Carrier", 5), new Ship(2,"Battleship", 4), new Ship(3,"Cruiser", 3), new Ship(4,"Submarine", 3), new Ship(5,"Destroyer", 2)));
 
         while (ships.size()> 0)
         {
@@ -98,17 +98,23 @@ public class Battleships {
             Boolean horizontal = (0 + (int)(Math.random() * 100)) % 2 == 1;
 
             if (grid[positionX][positionY] != null || !CheckShipCanFit(grid, ship.Size, positionX, positionY, horizontal)) continue;
-            grid[positionX][positionY] = ship.Name;
+            grid[positionX][positionY] = String.valueOf(ship.ID);
             if (horizontal)
             {
-                for (int i = 0; i < ship.Size; i++) grid[positionX+i][positionY] = ship.Name;
+                for (int i = 0; i < ship.Size; i++) grid[positionX+i][positionY] = String.valueOf(ship.ID);
             }
             else
             {
-                for (int i = 0; i < ship.Size; i++) grid[positionX][positionY + i] = ship.Name;
+                for (int i = 0; i < ship.Size; i++) grid[positionX][positionY + i] = String.valueOf(ship.ID);
             }
             ships.remove(0);
         }
+
+        //remove nulls
+        for (int i=0; i < 10; i++)
+            for (int j=0; j<10; j++)
+                if (grid[i][j] == null)
+                    grid[i][j] = " ";
 
         return "{ grid: ["+ Arrays.stream(grid).map(strings -> {
             return Arrays.stream(strings).collect(Collectors.joining(", "));
@@ -141,12 +147,14 @@ public class Battleships {
 
     private static class Ship
     {
+        public int ID;
         public String Name;
         public int Size;
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
-        public Ship(String name, int size)
+        public Ship(int id, String name, int size)
         {
+            ID = id;
             Name = name;
             Size = size;
         }
