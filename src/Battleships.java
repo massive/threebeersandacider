@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -107,7 +109,10 @@ public class Battleships {
             }
             ships.remove(0);
         }
-        return grid.toString();
+
+        return "{ grid: ["+ Arrays.stream(grid).map(strings -> {
+            return Arrays.stream(strings).collect(Collectors.joining(", "));
+        }).collect(Collectors.joining("], \n [")) + "]}";
     }
 
     private static Boolean CheckShipCanFit(String[][] grid, int shipSize, int positionX, int positionY, Boolean horizontal)
