@@ -22,19 +22,59 @@ public class Battleships {
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         System.out.println("Running at " + server.getAddress());
-        server.createContext("/", new MyHandler());
+        server.createContext("/start_game", new StartGameHandler());
+        server.createContext("/next_turn", new NextTurnHandler());
+        server.createContext("/end_game", new EndGameHandler());
         server.start();
     }
 
-    static class MyHandler implements HttpHandler {
+    static abstract class HandlerWithStringResponse implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            String response = "This is the response";
+            String response = getResponse();
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }
+
+        protected abstract String getResponse();
     }
 
+    static class StartGameHandler extends HandlerWithStringResponse {
+        @Override
+        protected String getResponse() {
+            return "{ grid:\n" +
+                "   [ [ '1', ' ', '2', '2', '2', '2', ' ', ' ', ' ', ' ' ],\n" +
+                "     [ '1', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],\n" +
+                "     [ '1', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],\n" +
+                "     [ '1', ' ', '3', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],\n" +
+                "     [ '1', ' ', '3', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],\n" +
+                "     [ ' ', ' ', '3', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],\n" +
+                "     [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],\n" +
+                "     [ ' ', ' ', ' ', ' ', '4', '4', '4', ' ', ' ', ' ' ],\n" +
+                "     [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '5' ],\n" +
+                "     [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '5' ] ]\n" +
+                "}\n";
+        }
+    }
+
+    static class NextTurnHandler extends HandlerWithStringResponse {
+        @Override
+        protected String getResponse() {
+            return "{\n" +
+                "  x: 6,\n" +
+                "  y: 2\n" +
+                "}\n";
+        }
+    }
+
+    static class EndGameHandler extends HandlerWithStringResponse {
+        @Override
+        protected String getResponse() {
+            return "{\n" +
+                "  \"message\" : \"AAAGH!\"\n" +
+                "}\n";
+        }
+    }
 }
