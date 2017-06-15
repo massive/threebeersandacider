@@ -116,9 +116,9 @@ public class Battleships {
                 if (grid[i][j] == null)
                     grid[i][j] = " ";
 
-        return "{ grid: ["+ Arrays.stream(grid).map(strings -> {
+        return "{ grid: [ [ "+ Arrays.stream(grid).map(strings -> {
             return "'" + Arrays.stream(strings).collect(Collectors.joining("', '")) + "'";
-        }).collect(Collectors.joining("], \n [")) + "]}";
+        }).collect(Collectors.joining(" ], \n [ ")) + " ] ] }";
     }
 
     private static Boolean CheckShipCanFit(String[][] grid, int shipSize, int positionX, int positionY, Boolean horizontal)
