@@ -14,11 +14,14 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import org.json.simple.parser.ParseException;
+import org.json.simple.parser.JSONParser;
+
 public class Battleships {
 
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-
+        System.out.println("Running at " + server.getAddress());
         server.createContext("/", new MyHandler());
         server.start();
     }
