@@ -179,7 +179,6 @@ public class Battleships {
             State setLastTargetTo = State.SHOT;
             switch (event) {
                 case "SUNK":
-                    // TODO: Set the rest of the ship to SUNK.
                     setLastTargetTo = State.SUNK;
                     break;
                 case "HIT":
@@ -192,7 +191,12 @@ public class Battleships {
                     System.err.println("Invalid event: " + event);
                     break;
             }
-            if (lastTarget != null) setState(lastTarget, setLastTargetTo);
+            if (lastTarget != null) {
+                setState(lastTarget, setLastTargetTo);
+                if (setLastTargetTo == State.SUNK) {
+                    setToSunk(lastTarget);
+                }
+            }
 
             int[] target = null;
             while (target == null) {
@@ -287,6 +291,21 @@ public class Battleships {
         final int y = target[1];
         if (x < 0 || y < 0 || x >= SIZE_X || y >= SIZE_Y) return State.INVALID;
         return grid[x][y];
+    }
+
+    private static void setToSunk(int[] target) {
+        setToSunk(target, 0, 1);
+        setToSunk(target, 0, -1);
+        setToSunk(target, 1, 0);
+        setToSunk(target, -1, 0);
+    }
+
+    private static void setToSunk(int[] target, int xd, int yd) {
+        int pos[] = target;
+        while (getState(pos) == State.SHIP || getState(pos) == State.SUNK) {
+            setState(pos, State.SUNK);
+            pos = move(pos, xd, yd);
+        }
     }
 
     private static void setState(int[] target, State setTo) {
