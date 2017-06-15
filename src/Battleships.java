@@ -86,7 +86,7 @@ public class Battleships {
     private static String getNewGrid()
     {
         String[][] grid = new String[10][10];
-        List<Ship> ships = Arrays.asList(new Ship("Carrier", 5), new Ship("Battleship", 4), new Ship("Cruiser", 3), new Ship("Submarine", 3), new Ship("Destroyer", 2));
+        List<Ship> ships = new LinkedList<Ship>( Arrays.asList(new Ship("Carrier", 5), new Ship("Battleship", 4), new Ship("Cruiser", 3), new Ship("Submarine", 3), new Ship("Destroyer", 2)));
 
         while (ships.size()> 0)
         {
