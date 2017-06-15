@@ -224,7 +224,7 @@ public class Battleships {
     private static final int SIZE_Y = 10;
 
     private enum State {
-        UNKNOWN, SHOT, SHIP, SUNK, NO_SHIP
+        UNKNOWN, SHOT, SHIP, SUNK, NO_SHIP, INVALID
     };
 
     private static State[][] grid = new State[SIZE_X][SIZE_Y];
@@ -242,10 +242,12 @@ public class Battleships {
     private static int[] lastTarget = null;
 
     private static int[] calculateTarget() {
-        int[] target;
-        while (true) {
-            target = getRandomTarget();
-            if (getState(target) == State.UNKNOWN) break;
+        int[] target = findTargetNextToShip();
+        if (target == null) {
+            while (true) {
+                target = getRandomTarget();
+                if (getState(target) == State.UNKNOWN) break;
+            }
         }
         System.out.println("Target: " + target[0] + ", " + target[1]);
         setState(target, State.SHOT);
@@ -253,8 +255,38 @@ public class Battleships {
         return target;
     }
 
+    private static int[] findShip() {
+        for (int y = 0; y < SIZE_Y; y++) {
+            for (int x = 0; x < SIZE_X; x++) {
+                int target[] = new int[]{x, y};
+                if (getState(target) == State.SHIP) {
+                    System.out.println("Ship: " + target[0] + ", " + target[1]);
+                    return target;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static int[] move(int[] pos, int xd, int yd) {
+        return new int[]{pos[0] + xd, pos[1] + yd};
+    }
+
+    private static int[] findTargetNextToShip() {
+        int ship[] = findShip();
+        if (ship == null) return null;
+        if (getState(move(ship, -1, 0)) == State.UNKNOWN) return move(ship, -1, 0);
+        if (getState(move(ship, 1, 0)) == State.UNKNOWN) return move(ship, 1, 0);
+        if (getState(move(ship, 0, -1)) == State.UNKNOWN) return move(ship, 0, -1);
+        if (getState(move(ship, 0, 1)) == State.UNKNOWN) return move(ship, 0, 1);
+        return null;
+    }
+
     private static State getState(int[] target) {
-        return grid[target[0]][target[1]];
+        final int x = target[0];
+        final int y = target[1];
+        if (x < 0 || y < 0 || x >= SIZE_X || y >= SIZE_Y) return State.INVALID;
+        return grid[x][y];
     }
 
     private static void setState(int[] target, State setTo) {
