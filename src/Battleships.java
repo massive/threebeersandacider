@@ -117,7 +117,7 @@ public class Battleships {
                     grid[i][j] = " ";
 
         return "{ grid: ["+ Arrays.stream(grid).map(strings -> {
-            return Arrays.stream(strings).collect(Collectors.joining(", "));
+            return "'" + Arrays.stream(strings).collect(Collectors.joining("', '")) + "'";
         }).collect(Collectors.joining("], \n [")) + "]}";
     }
 
