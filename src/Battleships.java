@@ -174,7 +174,26 @@ public class Battleships {
 
         @Override
         protected String getResponse(JSONObject params) {
-            System.out.println("got " + params.get("name"));
+            String event = "" + ((JSONObject)((JSONObject)params.get("report")).get("you")).get("event");
+            System.out.println("Got event: " + event);
+            State setLastTargetTo = State.SHOT;
+            switch (event) {
+                case "SUNK":
+                    // TODO: Set the rest of the ship to SUNK.
+                    setLastTargetTo = State.SUNK;
+                    break;
+                case "HIT":
+                    setLastTargetTo = State.SHIP;
+                    break;
+                case "MISS":
+                    setLastTargetTo = State.NO_SHIP;
+                    break;
+                default:
+                    System.err.println("Invalid event: " + event);
+                    break;
+            }
+            if (lastTarget != null) setState(lastTarget, setLastTargetTo);
+
             int[] target = null;
             while (target == null) {
                 System.out.println("Calculating target...");
@@ -185,7 +204,6 @@ public class Battleships {
                     System.err.println("Error: " + e + ". Trying again...");
                 }
             }
-            System.out.println("Target: " + target[0] + ", " + target[1]);
             return "{\n" +
                 "  x: " + target[0] + ",\n" +
                 "  y: " + target[1] + "\n" +
@@ -206,7 +224,7 @@ public class Battleships {
     private static final int SIZE_Y = 10;
 
     private enum State {
-        UNKNOWN, SHIP, NO_SHIP
+        UNKNOWN, SHOT, SHIP, SUNK, NO_SHIP
     };
 
     private static State[][] grid = new State[SIZE_X][SIZE_Y];
@@ -221,14 +239,18 @@ public class Battleships {
         }
     }
 
+    private static int[] lastTarget = null;
+
     private static int[] calculateTarget() {
-        int[] randomTarget;
+        int[] target;
         while (true) {
-            randomTarget = getRandomTarget();
-            if (getState(randomTarget) == State.UNKNOWN) break;
+            target = getRandomTarget();
+            if (getState(target) == State.UNKNOWN) break;
         }
-        setState(randomTarget, State.NO_SHIP);
-        return randomTarget;
+        System.out.println("Target: " + target[0] + ", " + target[1]);
+        setState(target, State.SHOT);
+        lastTarget = target;
+        return target;
     }
 
     private static State getState(int[] target) {
@@ -236,7 +258,10 @@ public class Battleships {
     }
 
     private static void setState(int[] target, State setTo) {
-        grid[target[0]][target[1]] = setTo;
+        final int x = target[0];
+        final int y = target[1];
+        System.out.println("Setting " + x + ", " + y + " to " + setTo);
+        grid[x][y] = setTo;
     }
 
     private static int[] getRandomTarget() {
